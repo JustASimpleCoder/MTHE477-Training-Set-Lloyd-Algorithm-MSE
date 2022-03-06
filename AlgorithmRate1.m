@@ -18,18 +18,19 @@ end
 
 % thus the inital codebook for m =1 1 is
 initialCodeBook = [-c,c];
+
 %initialize algorithm parameters
 epsilon = 0.001;
 m = 1;
 
 % step 2 and step 3:
-while ( ( meanDistortion(initialCodeBook, trainingSet, m) - meanDistortion(initialCodeBook, trainingSet, m+1) )/( meanDistortion(initialCodeBook,trainingSet, m)) ) < epsilon
-    [c1_m,c2_m] = partitionCodebook(initialCodeBook, trainingSet, m);
+[c1_m, c2_m] =  partitionCodebook(initialCodeBook, trainingSet, m);
+while ( ( meanDistortion([c1_m, c2_m], trainingSet, m) - meanDistortion([c1_m, c2_m], trainingSet, m+1) )/( meanDistortion([c1_m, c2_m],trainingSet, m)) ) < epsilon
     m = m + 1;
-    fprintf('%d', m)
+    [c1_m, c2_m] = partitionCodebook([c1_m, c2_m], trainingSet, m);
 end
 disp('The codebook yielding an approximation to the optimal code is:')
-disp([c1_m, c2_m])
+disp(initialCodeBook)
 
 % we can find how close there are to the optimal codebook, which in class
 % was shown to be 
@@ -41,7 +42,6 @@ percentageToOptimal_y2 = 100 - 100*abs(c_optimal - y2_m)/c_optimal;
 
 fprintf('y1_m is %.2f  perecnt optimal \n', percentageToOptimal_y1)
 fprintf('y2_m is is %.2f  percent  optimal \n', percentageToOptimal_y2)
-fprintf(" Hence the code  is %.2f percent optimal \n ", max(percentageToOptimal_y1,percentageToOptimal_y2) )
 
 
 
@@ -49,7 +49,7 @@ fprintf(" Hence the code  is %.2f percent optimal \n ", max(percentageToOptimal_
 % and the m-th iteration of the Lloyd algorithm, and partitions the training set into N=2 bins using the Nearest Neighbour Condition 
 % it returns the empiracal average inside each bin as the codeword for the (m+1)-th iteration [y1_(m+1), y2_(m+1)]
 % (follows from step 2 of LLoyds algorithm)
-function [y1_m, y2_m] = partitionCodebook(codeBook,tSet, m)
+function [y1, y2] = partitionCodebook(codeBook,tSet, m)
     trainingSet = tSet;
     c1 = codeBook(1);
     c2 = codeBook(2);
@@ -63,7 +63,7 @@ function [y1_m, y2_m] = partitionCodebook(codeBook,tSet, m)
         if abs(trainingSet(i) - c1^m) <= abs(trainingSet(i) - c2^m)
             bin1(j) = trainingSet(i);
             j = j + 1;
-        elseif abs(trainingSet(i) - c2^m) < abs(trainingSet(i) - c1^m) %assign lower index with equality
+        else %assign lower index with equality
             bin2(s) = trainingSet(i);
             s = s + 1;
         end
@@ -75,14 +75,14 @@ function [y1_m, y2_m] = partitionCodebook(codeBook,tSet, m)
     for i = 1:sz_bin1(2)    
         sum_bin1 = sum_bin1 + bin1(i);
     end
-    y1_m = (1/(sz_bin1(2)))*(sum_bin1);
+    y1 = (1/(sz_bin1(2)))*(sum_bin1);
     
     sum_bin2 = 0;
     sz_bin2 = size(bin2);
     for i = 1:sz_bin2(2)    
         sum_bin2 = sum_bin2 + bin2(i);
     end
-    y2_m = (1/(sz_bin2(2)))*(sum_bin2);
+    y2 = (1/(sz_bin2(2)))*(sum_bin2);
 end
   
 % computes the mean distortion after the m-th iteration of the code
@@ -95,12 +95,12 @@ function D_m = meanDistortion(codeBook,tSet, m)
     sum_distortion = 0;
     for i = 1:5000
         if trainingSet(i) > 0
-            sum_distortion = sum_distortion + (trainingSet(i) - c1^m);
+            sum_distortion = sum_distortion + (trainingSet(i) - c1^m)^2;
         else
-            sum_distortion = sum_distortion + (trainingSet(i) - c2^m);
+            sum_distortion = sum_distortion + (trainingSet(i) - c2^m)^2;
         end
     end
-    D_m = (1/5000)*sum_distortion^2;
+    D_m = (1/5000)*sum_distortion;
 end
 
 
