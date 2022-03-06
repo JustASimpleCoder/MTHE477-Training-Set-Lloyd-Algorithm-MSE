@@ -48,7 +48,7 @@ c_optimal = sqrt(2/pi);
 
 %hence we can compare the percentatges to the optimal
 percentageToOptimal_y1 = 100 - 100*abs(c_optimal - y1_m)/c_optimal;
-percentageToOptimal_y2 = 100 - 100*abs(c_optimal - y1_m)/c_optimal;
+percentageToOptimal_y2 = 100 - 100*abs(c_optimal + y2_m)/c_optimal;
 
 fprintf('y1_m is %.2f  perecnt optimal \n', percentageToOptimal_y1)
 fprintf('y2_m is is %.2f  percent  optimal \n', percentageToOptimal_y2)
@@ -89,7 +89,7 @@ function [y1_m, y2_m] = partitionCodebook(c,m)
     for i = 1:sz_bin2(2)    
         sum_bin2 = sum_bin2 + bin2(i);
     end
-    y2_m = (1/(sz_bin1(2)))*(sum_bin2);
+    y2_m = (1/(sz_bin2(2)))*(sum_bin2);
 end
   
 % computes the mean distortion after the m-th iteration of the code
