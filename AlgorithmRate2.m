@@ -7,7 +7,7 @@ clc
 %Step 1: (inputs)
 
 %training set of iid normally (gaussian) distributed source
-rng(1)
+rng('default')
 trainingSet = randn(1,5000);
 
 %estimate average value of X being postitive
